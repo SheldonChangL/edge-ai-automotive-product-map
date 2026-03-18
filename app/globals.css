@@ -15,6 +15,10 @@
   --button-surface: rgba(0, 0, 0, 0.2);
   --button-surface-hover: rgba(0, 0, 0, 0.3);
   --button-surface-active: rgba(255, 255, 255, 0.1);
+  --theme-toggle-shell: rgba(7, 17, 31, 0.22);
+  --theme-toggle-hover: rgba(255, 255, 255, 0.05);
+  --theme-toggle-active: rgba(255, 255, 255, 0.1);
+  --theme-toggle-shadow: 0 14px 30px rgba(7, 17, 31, 0.24);
   --border: rgba(180, 200, 226, 0.16);
   --border-strong: rgba(180, 200, 226, 0.28);
   --text: #eff5ff;
@@ -53,6 +57,10 @@ html[data-theme="editorial"] {
   --button-surface: rgba(17, 17, 17, 0.04);
   --button-surface-hover: rgba(17, 17, 17, 0.07);
   --button-surface-active: rgba(17, 17, 17, 0.08);
+  --theme-toggle-shell: rgba(17, 17, 17, 0.035);
+  --theme-toggle-hover: rgba(17, 17, 17, 0.045);
+  --theme-toggle-active: rgba(255, 255, 255, 0.94);
+  --theme-toggle-shadow: 0 8px 24px rgba(17, 17, 17, 0.06);
   --border: rgba(24, 24, 24, 0.14);
   --border-strong: rgba(24, 24, 24, 0.3);
   --text: #111111;

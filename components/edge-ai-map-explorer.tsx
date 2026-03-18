@@ -20,6 +20,19 @@ type EdgeAIMapExplorerProps = {
 type InsightPanel = "priority" | "report" | "trends";
 type ExplorerTheme = "matrix" | "editorial";
 
+const themeOptions = [
+  {
+    id: "matrix",
+    label: "Matrix",
+    caption: "沉浸式資料地圖",
+  },
+  {
+    id: "editorial",
+    label: "Editorial",
+    caption: "編輯報紙語氣",
+  },
+] as const;
+
 const priorityLabels: Record<ProductPriorityFilter, string> = {
   all: "全部優先級",
   high: "高優先級",
@@ -160,6 +173,7 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
   });
   const totalStats = getExplorerStats(content);
   const filteredCount = getFilteredProductCount(filteredCategories);
+  const isEditorial = theme === "editorial";
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("edge-ai-theme");
@@ -194,24 +208,68 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
   return (
     <main className="app-shell relative isolate min-h-screen" data-theme={theme}>
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 pb-16 pt-6 sm:px-8 lg:px-10">
-        <section className="overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[var(--hero-surface)] shadow-[var(--shadow-glow)]">
+        <section
+          className={[
+            "overflow-hidden border border-[color:var(--border)] bg-[var(--hero-surface)] shadow-[var(--shadow-glow)]",
+            isEditorial ? "rounded-[1rem]" : "rounded-[2rem]",
+          ].join(" ")}
+        >
           <div className="px-6 py-8 lg:px-10 lg:py-10">
             <div className="space-y-6">
+              {isEditorial ? (
+                <div className="space-y-4 border-b border-[color:var(--border)] pb-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3 font-[var(--font-mono)] text-[11px] uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                    <span>Wednesday, March 18, 2026</span>
+                    <span>Automotive Product Map Special Report</span>
+                    <span>47 Products</span>
+                  </div>
+                  <div className="space-y-2 text-center">
+                    <p className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.42em] text-[var(--text-faint)]">
+                      Edge AI Times
+                    </p>
+                    <h2 className="text-4xl font-semibold text-[var(--text)] sm:text-6xl">
+                      The Edge AI Times
+                    </h2>
+                  </div>
+                  <div className="grid gap-2">
+                    <div className="h-px bg-[var(--text)]" />
+                    <div className="h-px bg-[color:var(--border)]" />
+                  </div>
+                </div>
+              ) : null}
+
               <div className="space-y-4">
                 <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.38em] text-[var(--accent)]">
                   {content.hero.eyebrow}
                 </p>
                 <div className="space-y-4">
-                  <h1 className="max-w-4xl text-4xl font-black tracking-[-0.04em] text-[var(--text)] sm:text-5xl">
+                  <h1
+                    className={[
+                      "max-w-4xl text-[var(--text)]",
+                      isEditorial
+                        ? "text-5xl font-semibold leading-[0.96] sm:text-7xl"
+                        : "text-4xl font-black tracking-[-0.04em] sm:text-5xl",
+                    ].join(" ")}
+                  >
                     {content.hero.title}
                   </h1>
-                  <p className="max-w-3xl text-base leading-8 text-[var(--text-muted)] sm:text-lg">
+                  <p
+                    className={[
+                      "max-w-3xl text-[var(--text-muted)]",
+                      isEditorial ? "text-lg leading-8 sm:text-xl" : "text-base leading-8 sm:text-lg",
+                    ].join(" ")}
+                  >
                     {content.hero.description}
                   </p>
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div
+                className={[
+                  "grid gap-4 sm:grid-cols-3",
+                  isEditorial ? "border-t border-[color:var(--border)] pt-6" : "",
+                ].join(" ")}
+              >
                 {[
                   {
                     label: "產品領域",
@@ -231,10 +289,16 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-3xl border border-[color:var(--border)] bg-[var(--card-surface)] px-5 py-4 backdrop-blur"
+                    className={[
+                      "border border-[color:var(--border)] bg-[var(--card-surface)] px-5 py-4 backdrop-blur",
+                      isEditorial ? "rounded-[0.25rem]" : "rounded-3xl",
+                    ].join(" ")}
                   >
                     <div
-                      className="font-[var(--font-mono)] text-3xl font-semibold"
+                      className={[
+                        "font-[var(--font-mono)] font-semibold",
+                        isEditorial ? "text-4xl" : "text-3xl",
+                      ].join(" ")}
                       style={{ color: stat.accent }}
                     >
                       {stat.value}
@@ -247,7 +311,12 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
           </div>
         </section>
 
-        <section className="grid gap-4 rounded-[1.75rem] border border-[color:var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-glow)] backdrop-blur-sm lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] lg:items-center">
+        <section
+          className={[
+            "grid gap-4 border border-[color:var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-glow)] backdrop-blur-sm lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] lg:items-center",
+            isEditorial ? "rounded-[0.75rem]" : "rounded-[1.75rem]",
+          ].join(" ")}
+        >
           <label className="relative block">
             <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-lg text-[var(--text-faint)]">
               ⌕
@@ -287,26 +356,30 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
             ))}
           </div>
 
-          <div className="flex gap-2">
-            {[
-              { id: "matrix", label: "Matrix" },
-              { id: "editorial", label: "Editorial" },
-            ].map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => setTheme(option.id as ExplorerTheme)}
-                className={[
-                  "rounded-full border px-4 py-2 text-sm transition",
-                  theme === option.id
-                    ? "border-[color:var(--border-strong)] bg-[var(--button-surface-active)] text-[var(--text)]"
-                    : "border-[color:var(--border)] bg-[var(--button-surface)] text-[var(--text-muted)] hover:border-[color:var(--border-strong)] hover:bg-[var(--button-surface-hover)] hover:text-[var(--text)]",
-                ].join(" ")}
-                aria-pressed={theme === option.id}
-              >
-                {option.label}
-              </button>
-            ))}
+          <div className="flex items-center justify-start">
+            <div className="rounded-[1rem] border border-[color:var(--border)] bg-[var(--theme-toggle-shell)] p-1 shadow-[var(--theme-toggle-shadow)]">
+              <div className="flex gap-1">
+                {themeOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setTheme(option.id as ExplorerTheme)}
+                    className={[
+                      "min-w-[9.5rem] rounded-[0.75rem] border px-3 py-2 text-left transition",
+                      theme === option.id
+                        ? "border-[color:var(--border-strong)] bg-[var(--theme-toggle-active)] text-[var(--text)]"
+                        : "border-transparent bg-transparent text-[var(--text-muted)] hover:border-[color:var(--border)] hover:bg-[var(--theme-toggle-hover)] hover:text-[var(--text)]",
+                    ].join(" ")}
+                    aria-pressed={theme === option.id}
+                  >
+                    <span className="block text-sm font-semibold">{option.label}</span>
+                    <span className="mt-1 block text-[11px] leading-4 text-[var(--text-faint)]">
+                      {option.caption}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="rounded-full border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-2 font-[var(--font-mono)] text-xs uppercase tracking-[0.22em] text-[var(--text-muted)]">
@@ -314,7 +387,12 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
           </div>
         </section>
 
-        <section className="rounded-[1.5rem] border border-[color:var(--border)] bg-[var(--surface-alt)] p-4 shadow-[var(--shadow-glow)]">
+        <section
+          className={[
+            "border border-[color:var(--border)] bg-[var(--surface-alt)] p-4 shadow-[var(--shadow-glow)]",
+            isEditorial ? "rounded-[0.75rem]" : "rounded-[1.5rem]",
+          ].join(" ")}
+        >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-1">
@@ -368,7 +446,10 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                 {priorityGuides.map((guide) => (
                   <article
                     key={guide.level}
-                    className="rounded-[1.15rem] border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3"
+                    className={[
+                      "border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3",
+                      isEditorial ? "rounded-[0.25rem]" : "rounded-[1.15rem]",
+                    ].join(" ")}
                   >
                     <div className="flex items-center gap-2">
                       <span
@@ -428,7 +509,10 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                   {content.reportOverview.findings.map((item, index) => (
                     <div
                       key={item}
-                      className="rounded-[1.1rem] border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3"
+                      className={[
+                        "border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3",
+                        isEditorial ? "rounded-[0.25rem]" : "rounded-[1.1rem]",
+                      ].join(" ")}
                     >
                       <p className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.24em] text-[var(--text-faint)]">
                         Finding {String(index + 1).padStart(2, "0")}
@@ -449,7 +533,10 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                     {content.reportOverview.outlook.map((item, index) => (
                       <div
                         key={item}
-                        className="rounded-[1.15rem] border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3"
+                        className={[
+                          "border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3",
+                          isEditorial ? "rounded-[0.25rem]" : "rounded-[1.15rem]",
+                        ].join(" ")}
                       >
                         <p className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.24em] text-[var(--text-faint)]">
                           Outlook {String(index + 1).padStart(2, "0")}
@@ -473,7 +560,10 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                 {content.trendInsights.map((insight) => (
                   <div
                     key={insight.id}
-                    className="rounded-[1.15rem] border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3"
+                    className={[
+                      "border border-[color:var(--border)] bg-[var(--card-surface)] px-4 py-3",
+                      isEditorial ? "rounded-[0.25rem]" : "rounded-[1.15rem]",
+                    ].join(" ")}
                   >
                     <p className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.24em] text-[var(--text-faint)]">
                       {insight.id}

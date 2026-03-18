@@ -77,7 +77,7 @@ describe("EdgeAIMapExplorer", () => {
 
     render(<EdgeAIMapExplorer content={edgeAIMapContent} />);
 
-    await user.click(screen.getByRole("button", { name: "Editorial" }));
+    await user.click(screen.getByRole("button", { name: /Editorial/ }));
 
     expect(document.documentElement.dataset.theme).toBe("editorial");
     expect(window.localStorage.getItem("edge-ai-theme")).toBe("editorial");
