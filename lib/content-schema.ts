@@ -33,7 +33,6 @@ export const mapHeroSchema = z.object({
   eyebrow: z.string().min(1),
   title: z.string().min(1),
   description: z.string().min(1),
-  matrixNotes: z.array(z.string().min(1)).min(1),
 });
 
 export const mapContentSchema = z.object({

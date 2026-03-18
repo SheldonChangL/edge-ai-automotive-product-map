@@ -12,11 +12,6 @@ export const edgeAIMapContent = mapContentSchema.parse({
     title: "車用電子 AI 產品全景圖",
     description:
       "從感測融合、座艙智能到車聯網與能源管理，將車用 Edge AI 產品、端側推論方案與晶片平台整理成可探索的互動地圖。",
-    matrixNotes: [
-      "保留設計稿的矩陣密度感，改用可搜尋與可分享的互動探索介面。",
-      "所有產品資料已從 UI 抽離，後續新增分類、欄位或外部資料來源時不需要重寫頁面。",
-      "以靜態站點交付，但保留 URL state、穩定 ID 與 schema 驗證，方便未來接 API 或 CMS。",
-    ],
   },
   categories: [
     {
