@@ -10,6 +10,10 @@ describe("content schema", () => {
     expect(edgeAIMapContent.categories).toHaveLength(10);
     expect(productIds).toHaveLength(47);
     expect(new Set(productIds).size).toBe(productIds.length);
+    expect(edgeAIMapContent.reportOverview.findings).toHaveLength(5);
+    expect(edgeAIMapContent.categories[0].products[0].productionStatus).toBeTruthy();
+    expect(edgeAIMapContent.categories[0].products[0].oemAdoption).toBeTruthy();
+    expect(edgeAIMapContent.categories[0].products[0].keyInsight).toBeTruthy();
   });
 
   it("rejects content with missing stable ids", () => {

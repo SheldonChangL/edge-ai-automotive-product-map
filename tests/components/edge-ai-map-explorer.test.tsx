@@ -34,9 +34,29 @@ describe("EdgeAIMapExplorer", () => {
     render(<EdgeAIMapExplorer content={edgeAIMapContent} />);
 
     expect(screen.getByRole("heading", { name: "車用電子 AI 產品全景圖" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "優先級怎麼看？" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "快速看懂這張圖" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "優先級說明" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "報告摘要" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "延伸觀察" })).toBeInTheDocument();
     expect(screen.getByText("Showing 47 / 47")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "ADAS 先進駕駛輔助" })).toBeInTheDocument();
+  });
+
+  it("reveals the report overview only when requested", async () => {
+    const user = userEvent.setup();
+
+    render(<EdgeAIMapExplorer content={edgeAIMapContent} />);
+
+    expect(screen.queryByRole("heading", { name: "報告重點" })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "報告摘要" }));
+
+    expect(screen.getByRole("heading", { name: "報告重點" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /展開趨勢展望/ })).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /展開趨勢展望/ }));
+
+    expect(screen.getByRole("heading", { name: "趨勢展望" })).toBeInTheDocument();
   });
 
   it("updates the product count when a priority filter is selected", async () => {
@@ -66,6 +86,8 @@ describe("EdgeAIMapExplorer", () => {
 
     expect(screen.getByText("CNN 即時推論 (YOLOv8-nano / MobileNet)")).toBeInTheDocument();
     expect(screen.getByText("TI TDA4VM / Mobileye EyeQ")).toBeInTheDocument();
+    expect(screen.getByText(/Tesla \(HW4 全車 8-13 攝影機純視覺方案\)/)).toBeInTheDocument();
+    expect(screen.getByText(/Tesla 率先放棄雷達改用純視覺路線/)).toBeInTheDocument();
   });
 
   it("shows an empty state for unmatched search", async () => {

@@ -1,9 +1,14 @@
 import type { AutomotiveProduct } from "@/lib/content-schema";
 import { mapContentSchema } from "@/lib/content-schema";
+import { productReportDetails, reportOverview } from "@/content/report-enrichment";
 
-const product = <const T extends string>(id: T, details: Omit<AutomotiveProduct, "id">) => ({
+const product = <const T extends keyof typeof productReportDetails>(
+  id: T,
+  details: Omit<AutomotiveProduct, "id" | "productionStatus" | "oemAdoption" | "keyInsight">,
+) => ({
   id,
   ...details,
+  ...productReportDetails[id],
 });
 
 export const edgeAIMapContent = mapContentSchema.parse({
@@ -13,6 +18,7 @@ export const edgeAIMapContent = mapContentSchema.parse({
     description:
       "從感測融合、座艙智能到車聯網與能源管理，將車用 Edge AI 產品、端側推論方案與晶片平台整理成可探索的互動地圖。",
   },
+  reportOverview,
   categories: [
     {
       id: "adas",

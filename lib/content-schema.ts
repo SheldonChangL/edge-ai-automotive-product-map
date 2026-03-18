@@ -9,6 +9,9 @@ export const automotiveProductSchema = z.object({
   edge: z.string().min(1),
   chip: z.string().min(1),
   priority: productPrioritySchema,
+  productionStatus: z.string().min(1).optional(),
+  oemAdoption: z.string().min(1).optional(),
+  keyInsight: z.string().min(1).optional(),
   tags: z.array(z.string().min(1)).optional(),
   notes: z.string().min(1).optional(),
   vendors: z.array(z.string().min(1)).optional(),
@@ -35,8 +38,15 @@ export const mapHeroSchema = z.object({
   description: z.string().min(1),
 });
 
+export const reportOverviewSchema = z.object({
+  summary: z.string().min(1),
+  findings: z.array(z.string().min(1)).min(1),
+  outlook: z.array(z.string().min(1)).min(1),
+});
+
 export const mapContentSchema = z.object({
   hero: mapHeroSchema,
+  reportOverview: reportOverviewSchema,
   categories: z.array(automotiveCategorySchema).min(1),
   trendInsights: z.array(trendInsightSchema).min(1),
 });
@@ -45,4 +55,5 @@ export type ProductPriority = z.infer<typeof productPrioritySchema>;
 export type AutomotiveProduct = z.infer<typeof automotiveProductSchema>;
 export type AutomotiveCategory = z.infer<typeof automotiveCategorySchema>;
 export type TrendInsight = z.infer<typeof trendInsightSchema>;
+export type ReportOverview = z.infer<typeof reportOverviewSchema>;
 export type MapContent = z.infer<typeof mapContentSchema>;
