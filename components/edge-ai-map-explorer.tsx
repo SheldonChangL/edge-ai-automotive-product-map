@@ -12,12 +12,175 @@ import {
   type ProductPriorityFilter,
 } from "@/lib/filter-products";
 import type { AutomotiveCategory, MapContent } from "@/lib/content-schema";
+import { regionalAnalysisContent, regionIds, type RegionId } from "@/content/regional-analysis";
+
+const REGION_COLORS: Record<RegionId, string> = {
+  cn: "#f97316",
+  jp: "#60a5fa",
+  kr: "#4ade80",
+  eu: "#a78bfa",
+  us: "#ef4444",
+};
+
+const REGION_LABELS: Record<RegionId, string> = {
+  cn: "中國",
+  jp: "日本",
+  kr: "韓國",
+  eu: "歐洲",
+  us: "美國",
+};
+
+const RADAR_SHORT_NAMES = [
+  "ADAS 感測融合",
+  "座艙 DMS/OMS",
+  "語音 AI",
+  "IVI 座艙",
+  "BMS AI",
+  "底盤安全",
+  "V2X 車聯網",
+  "智慧照明",
+  "自動泊車",
+  "車身電子",
+];
+
+function RadarChart({ isEditorial }: { isEditorial: boolean }) {
+  const size = 500;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 158;
+  const labelGap = 30;
+  const n = regionalAnalysisContent.scoringMatrix.length;
+  const levels = [2, 4, 6, 8, 10];
+
+  const gridColor = isEditorial ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)";
+  const axisColor = isEditorial ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)";
+  const labelColor = isEditorial ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.68)";
+  const levelColor = isEditorial ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.28)";
+
+  function angleOf(i: number) {
+    return -Math.PI / 2 + (2 * Math.PI * i) / n;
+  }
+
+  function pt(i: number, value: number) {
+    const a = angleOf(i);
+    return { x: cx + r * (value / 10) * Math.cos(a), y: cy + r * (value / 10) * Math.sin(a) };
+  }
+
+  function axisEnd(i: number) {
+    const a = angleOf(i);
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+
+  function labelPos(i: number) {
+    const a = angleOf(i);
+    return { x: cx + (r + labelGap) * Math.cos(a), y: cy + (r + labelGap) * Math.sin(a) };
+  }
+
+  function textAnchor(i: number) {
+    const c = Math.cos(angleOf(i));
+    return c > 0.2 ? "start" : c < -0.2 ? "end" : "middle";
+  }
+
+  function dy(i: number) {
+    const s = Math.sin(angleOf(i));
+    return s < -0.2 ? "-0.45em" : s > 0.2 ? "1em" : "0.32em";
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <svg
+        viewBox={`0 0 ${size} ${size}`}
+        className="w-full max-w-[460px]"
+        aria-label="區域市場評分雷達圖"
+      >
+        {/* Grid rings */}
+        {levels.map((level) => {
+          const pts = regionalAnalysisContent.scoringMatrix
+            .map((_, i) => { const p = pt(i, level); return `${p.x},${p.y}`; })
+            .join(" ");
+          return <polygon key={level} points={pts} fill="none" stroke={gridColor} strokeWidth="0.8" />;
+        })}
+
+        {/* Axis lines */}
+        {regionalAnalysisContent.scoringMatrix.map((_, i) => {
+          const e = axisEnd(i);
+          return <line key={i} x1={cx} y1={cy} x2={e.x} y2={e.y} stroke={axisColor} strokeWidth="0.8" />;
+        })}
+
+        {/* Level labels along top axis */}
+        {[2, 4, 6, 8].map((level) => {
+          const p = pt(0, level);
+          return (
+            <text key={level} x={p.x} y={p.y - 5} textAnchor="middle" fill={levelColor} fontSize="9" fontFamily="monospace">
+              {level}
+            </text>
+          );
+        })}
+
+        {/* Polygon fills */}
+        {regionIds.map((rid) => {
+          const pts = regionalAnalysisContent.scoringMatrix
+            .map((domain, i) => { const p = pt(i, domain.scores[rid]); return `${p.x},${p.y}`; })
+            .join(" ");
+          return <polygon key={`f-${rid}`} points={pts} fill={REGION_COLORS[rid]} fillOpacity={0.08} stroke="none" />;
+        })}
+
+        {/* Polygon strokes + dots */}
+        {regionIds.map((rid) => {
+          const color = REGION_COLORS[rid];
+          const pts = regionalAnalysisContent.scoringMatrix
+            .map((domain, i) => { const p = pt(i, domain.scores[rid]); return `${p.x},${p.y}`; })
+            .join(" ");
+          return (
+            <g key={`s-${rid}`}>
+              <polygon points={pts} fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" />
+              {regionalAnalysisContent.scoringMatrix.map((domain, i) => {
+                const p = pt(i, domain.scores[rid]);
+                return <circle key={i} cx={p.x} cy={p.y} r={3} fill={color} />;
+              })}
+            </g>
+          );
+        })}
+
+        {/* Axis labels */}
+        {RADAR_SHORT_NAMES.map((name, i) => {
+          const pos = labelPos(i);
+          return (
+            <text
+              key={name}
+              x={pos.x}
+              y={pos.y}
+              textAnchor={textAnchor(i)}
+              dy={dy(i)}
+              fill={labelColor}
+              fontSize="11.5"
+              fontFamily="inherit"
+            >
+              {name}
+            </text>
+          );
+        })}
+      </svg>
+
+      {/* Legend */}
+      <div className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+        {regionIds.map((rid) => (
+          <div key={rid} className="flex items-center gap-1.5">
+            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: REGION_COLORS[rid] }} />
+            <span className="text-xs text-[var(--text-muted)]">{REGION_LABELS[rid]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 type EdgeAIMapExplorerProps = {
   content: MapContent;
 };
 
 type InsightPanel = "priority" | "report" | "trends";
+type TopTab = "map" | "regional";
 type ExplorerTheme = "matrix" | "editorial";
 
 const themeOptions = [
@@ -164,6 +327,7 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
   const [activeInsightPanel, setActiveInsightPanel] = useState<InsightPanel | null>(null);
   const [showReportDetails, setShowReportDetails] = useState(false);
   const [theme, setTheme] = useState<ExplorerTheme>("matrix");
+  const [activeTopTab, setActiveTopTab] = useState<TopTab>("map");
 
   const deferredQuery = useDeferredValue(query);
   const filteredCategories = filterCategories(content, {
@@ -311,6 +475,31 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
           </div>
         </section>
 
+        {/* Top-level tab nav */}
+        <nav className="flex gap-1 self-start rounded-full border border-[color:var(--border)] bg-[var(--surface)] p-1 shadow-[var(--shadow-glow)]">
+          {([
+            { id: "map", label: "產品地圖" },
+            { id: "regional", label: "🌏 區域分析" },
+          ] as { id: TopTab; label: string }[]).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTopTab(tab.id)}
+              className={[
+                "rounded-full px-5 py-2 text-sm font-medium transition",
+                activeTopTab === tab.id
+                  ? "bg-[var(--button-surface-active)] text-[var(--text)] shadow-sm"
+                  : "text-[var(--text-muted)] hover:bg-[var(--button-surface-hover)] hover:text-[var(--text)]",
+              ].join(" ")}
+              aria-pressed={activeTopTab === tab.id}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        {activeTopTab === "map" ? (
+          <>
         <section
           className={[
             "grid gap-4 border border-[color:var(--border)] bg-[var(--surface)] p-5 shadow-[var(--shadow-glow)] backdrop-blur-sm lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] lg:items-center",
@@ -580,6 +769,7 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                 ))}
               </div>
             ) : null}
+
           </div>
         </section>
 
@@ -809,6 +999,187 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
             </section>
           )}
         </section>
+          </>
+        ) : null}
+
+        {activeTopTab === "regional" ? (
+          <section className="flex flex-col gap-8">
+            {/* Regional header */}
+            <div className="space-y-2">
+              <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                Regional Market Analysis · 2025–2026
+              </p>
+              <h2 className={["text-[var(--text)]", isEditorial ? "text-4xl font-semibold" : "text-3xl font-black tracking-tight"].join(" ")}>
+                區域市場交叉分析
+              </h2>
+              <p className="max-w-3xl text-sm leading-7 text-[var(--text-muted)]">
+                涵蓋中國、日本、韓國、歐洲、美國五大區域，10 大領域綜合評分（技術先進性 × 量產規模 × 法規推動力 × 供應鏈掌控）。資料時間範圍：2025 年 — 2026 年 Q1。
+              </p>
+            </div>
+
+            {/* Radar + Matrix side-by-side on large screens */}
+            <div className="grid gap-6 xl:grid-cols-[1fr_auto]">
+              {/* Radar chart */}
+              <div className={[
+                "border border-[color:var(--border)] bg-[var(--surface-alt)] p-6",
+                isEditorial ? "rounded-[0.75rem]" : "rounded-[1.5rem]",
+              ].join(" ")}>
+                <p className="mb-4 font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                  Radar Chart · 10 Domains × 5 Regions
+                </p>
+                <RadarChart isEditorial={isEditorial} />
+              </div>
+
+              {/* Scoring matrix */}
+              <div className={[
+                "border border-[color:var(--border)] bg-[var(--surface-alt)] p-6",
+                isEditorial ? "rounded-[0.75rem]" : "rounded-[1.5rem]",
+              ].join(" ")}>
+                <p className="mb-4 font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                  Scoring Matrix · /10
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[340px] border-collapse text-sm">
+                    <thead>
+                      <tr>
+                        <th className="pb-3 pr-4 text-left text-xs font-medium text-[var(--text-muted)]">領域</th>
+                        {regionalAnalysisContent.regions.map((r) => (
+                          <th key={r.id} className="pb-3 px-2 text-center font-medium text-[var(--text-muted)]">
+                            <span className="text-lg">{r.flag}</span>
+                            <span className="mt-0.5 block text-[10px] text-[var(--text-faint)]">{r.name}</span>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {regionalAnalysisContent.scoringMatrix.map((row, i) => (
+                        <tr key={row.domainName} className={["border-t border-[color:var(--border)]", i === 0 ? "border-t-0" : ""].join(" ")}>
+                          <td className="py-2 pr-4 text-xs text-[var(--text)]">{row.domainName}</td>
+                          {regionIds.map((rid) => {
+                            const score = row.scores[rid];
+                            const bg = score >= 9
+                              ? "bg-[var(--score-high)] text-[var(--score-high-text)]"
+                              : score >= 7
+                                ? "bg-[var(--score-mid)] text-[var(--score-mid-text)]"
+                                : "bg-[var(--score-low)] text-[var(--score-low-text)]";
+                            return (
+                              <td key={rid} className="px-2 py-2 text-center">
+                                <span className={["inline-block min-w-[2rem] rounded px-1.5 py-0.5 font-[var(--font-mono)] text-xs font-semibold", bg].join(" ")}>
+                                  {score}
+                                </span>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                      <tr className="border-t-2 border-[color:var(--border-strong)]">
+                        <td className="pt-3 pr-4 text-xs font-semibold text-[var(--text)]">平均</td>
+                        {regionIds.map((rid) => {
+                          const avg = regionalAnalysisContent.scoringMatrix.reduce((sum, row) => sum + row.scores[rid], 0) / regionalAnalysisContent.scoringMatrix.length;
+                          return (
+                            <td key={rid} className="px-2 pt-3 text-center font-[var(--font-mono)] text-sm font-bold text-[var(--text)]">
+                              {avg.toFixed(1)}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {[
+                    { label: "9–10 領先", cls: "bg-[var(--score-high)] text-[var(--score-high-text)]" },
+                    { label: "7–8 成熟", cls: "bg-[var(--score-mid)] text-[var(--score-mid-text)]" },
+                    { label: "5–6 發展中", cls: "bg-[var(--score-low)] text-[var(--score-low-text)]" },
+                  ].map((item) => (
+                    <span key={item.label} className={["rounded px-2.5 py-0.5 font-[var(--font-mono)] text-[11px]", item.cls].join(" ")}>
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Region overview cards — all 5 in a row */}
+            <div className="flex flex-col gap-3">
+              <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                Region Overview
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {regionalAnalysisContent.regions.map((region) => (
+                  <article
+                    key={region.id}
+                    className={["border bg-[var(--card-surface)] px-5 py-4", isEditorial ? "rounded-[0.25rem] border-[color:var(--border)]" : "rounded-[1.25rem] border-[color:var(--border)]"].join(" ")}
+                    style={{ borderTopColor: REGION_COLORS[region.id], borderTopWidth: "2px" }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{region.flag}</span>
+                      <h3 className="text-sm font-semibold text-[var(--text)]">{region.name}</h3>
+                    </div>
+                    <p className="mt-2 text-[11px] font-semibold leading-5" style={{ color: REGION_COLORS[region.id] }}>
+                      {region.strategy}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-5 text-[var(--text-muted)]">{region.drivers}</p>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {region.oems.slice(0, 4).map((oem) => (
+                        <span key={oem} className="rounded-full border border-[color:var(--border)] bg-[var(--chip-surface)] px-2 py-0.5 text-[10px] text-[var(--text-muted)]">
+                          {oem}
+                        </span>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            {/* Key trends */}
+            <div className="flex flex-col gap-3">
+              <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                Key Trends
+              </p>
+              <div className="grid gap-4 lg:grid-cols-2">
+                {regionalAnalysisContent.trends.map((trend) => (
+                  <div key={trend.id} className={["border border-[color:var(--border)] bg-[var(--card-surface)] px-5 py-4", isEditorial ? "rounded-[0.25rem]" : "rounded-[1.25rem]"].join(" ")}>
+                    <p className="font-[var(--font-mono)] text-[11px] uppercase tracking-[0.24em] text-[var(--text-faint)]">{trend.id}</p>
+                    <h4 className="mt-2 text-base font-semibold text-[var(--text)]">{trend.title}</h4>
+                    <p className="mt-2 text-sm leading-7 text-[var(--text-muted)]">{trend.summary}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chip race */}
+            <div className="flex flex-col gap-3">
+              <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                OEM Self-Designed Chip Race · 2025–2026
+              </p>
+              <div className={["overflow-hidden border border-[color:var(--border)]", isEditorial ? "rounded-[0.25rem]" : "rounded-[1.25rem]"].join(" ")}>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[480px] border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-[color:var(--border)] bg-[var(--surface-strong)]">
+                        {["車廠", "晶片名稱", "製程", "算力", "狀態"].map((col) => (
+                          <th key={col} className="px-5 py-3 text-left text-xs font-medium text-[var(--text-muted)]">{col}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {regionalAnalysisContent.chipRace.map((entry, i) => (
+                        <tr key={entry.oem} className={["border-t border-[color:var(--border)]", i % 2 === 0 ? "bg-[var(--card-surface)]" : ""].join(" ")}>
+                          <td className="px-5 py-3 font-semibold text-[var(--text)]">{entry.oem}</td>
+                          <td className="px-5 py-3 font-[var(--font-mono)] text-xs text-[var(--text)]">{entry.chip}</td>
+                          <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{entry.process}</td>
+                          <td className="px-5 py-3 font-[var(--font-mono)] text-xs font-semibold text-[var(--text)]">{entry.tops}</td>
+                          <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{entry.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
       </div>
     </main>

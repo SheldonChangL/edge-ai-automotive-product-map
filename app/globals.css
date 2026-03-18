@@ -27,6 +27,12 @@
   --accent: #ff6b57;
   --accent-secondary: #46c0a3;
   --accent-tertiary: #ffd166;
+  --score-high: rgba(70, 192, 163, 0.25);
+  --score-high-text: #46c0a3;
+  --score-mid: rgba(255, 209, 102, 0.2);
+  --score-mid-text: #ffd166;
+  --score-low: rgba(255, 255, 255, 0.06);
+  --score-low-text: #9eb0ca;
   --font-display:
     "Iowan Old Style",
     "Palatino Linotype",
@@ -73,6 +79,12 @@ html[data-theme="editorial"] {
   --shell-glow-a: transparent;
   --shell-glow-b: transparent;
   --shadow-glow: 0 18px 48px rgba(17, 17, 17, 0.08);
+  --score-high: rgba(17, 120, 90, 0.15);
+  --score-high-text: #0d6b50;
+  --score-mid: rgba(180, 130, 0, 0.12);
+  --score-mid-text: #8a6200;
+  --score-low: rgba(17, 17, 17, 0.05);
+  --score-low-text: #666666;
 }
 
 * {
