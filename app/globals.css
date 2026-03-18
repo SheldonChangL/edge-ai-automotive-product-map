@@ -4,8 +4,17 @@
   --background: #07111f;
   --background-soft: #0d1a2a;
   --surface: rgba(10, 19, 34, 0.72);
+  --surface-alt: linear-gradient(180deg, rgba(10, 19, 33, 0.9), rgba(8, 16, 29, 0.76));
+  --hero-surface: linear-gradient(135deg, rgba(8, 16, 28, 0.95), rgba(9, 20, 37, 0.88) 48%, rgba(14, 26, 45, 0.94));
   --surface-strong: rgba(12, 25, 45, 0.94);
   --surface-elevated: rgba(18, 30, 54, 0.92);
+  --card-surface: rgba(255, 255, 255, 0.04);
+  --chip-surface: rgba(255, 255, 255, 0.05);
+  --input-surface: rgba(255, 255, 255, 0.04);
+  --detail-surface: rgba(0, 0, 0, 0.2);
+  --button-surface: rgba(0, 0, 0, 0.2);
+  --button-surface-hover: rgba(0, 0, 0, 0.3);
+  --button-surface-active: rgba(255, 255, 255, 0.1);
   --border: rgba(180, 200, 226, 0.16);
   --border-strong: rgba(180, 200, 226, 0.28);
   --text: #eff5ff;
@@ -14,7 +23,48 @@
   --accent: #ff6b57;
   --accent-secondary: #46c0a3;
   --accent-tertiary: #ffd166;
+  --font-display:
+    "Iowan Old Style",
+    "Palatino Linotype",
+    "Book Antiqua",
+    "Times New Roman",
+    serif;
+  --page-background:
+    radial-gradient(circle at top left, rgba(255, 107, 87, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(70, 192, 163, 0.12), transparent 24%),
+    linear-gradient(180deg, #06101d 0%, #091425 38%, #07111f 100%);
+  --shell-glow-a: rgba(255, 107, 87, 0.16);
+  --shell-glow-b: rgba(70, 192, 163, 0.12);
   --shadow-glow: 0 28px 80px rgba(7, 17, 31, 0.4);
+}
+
+html[data-theme="editorial"] {
+  --background: #f1eeea;
+  --background-soft: #f7f5f1;
+  --surface: rgba(251, 250, 247, 0.94);
+  --surface-alt: linear-gradient(180deg, rgba(251, 250, 247, 0.98), rgba(245, 242, 236, 0.94));
+  --hero-surface: linear-gradient(180deg, rgba(252, 251, 248, 0.98), rgba(244, 240, 234, 0.96));
+  --surface-strong: rgba(251, 250, 247, 0.98);
+  --surface-elevated: rgba(244, 240, 234, 0.98);
+  --card-surface: rgba(255, 255, 255, 0.82);
+  --chip-surface: rgba(17, 17, 17, 0.04);
+  --input-surface: rgba(255, 255, 255, 0.9);
+  --detail-surface: rgba(17, 17, 17, 0.03);
+  --button-surface: rgba(17, 17, 17, 0.04);
+  --button-surface-hover: rgba(17, 17, 17, 0.07);
+  --button-surface-active: rgba(17, 17, 17, 0.08);
+  --border: rgba(24, 24, 24, 0.14);
+  --border-strong: rgba(24, 24, 24, 0.3);
+  --text: #111111;
+  --text-muted: #4c4c4c;
+  --text-faint: #777777;
+  --accent: #111111;
+  --accent-secondary: #111111;
+  --accent-tertiary: #7d1f1f;
+  --page-background: linear-gradient(180deg, #f0ede8 0%, #f7f5f1 100%);
+  --shell-glow-a: transparent;
+  --shell-glow-b: transparent;
+  --shadow-glow: 0 18px 48px rgba(17, 17, 17, 0.08);
 }
 
 * {
@@ -22,10 +72,7 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top left, rgba(255, 107, 87, 0.16), transparent 28%),
-    radial-gradient(circle at top right, rgba(70, 192, 163, 0.12), transparent 24%),
-    linear-gradient(180deg, #06101d 0%, #091425 38%, #07111f 100%);
+  background: var(--page-background);
   color: var(--text);
   scroll-behavior: smooth;
 }
@@ -79,7 +126,7 @@ input {
   left: -4rem;
   width: 18rem;
   height: 18rem;
-  background: rgba(255, 107, 87, 0.16);
+  background: var(--shell-glow-a);
 }
 
 .app-shell::after {
@@ -87,5 +134,13 @@ input {
   right: -3rem;
   width: 16rem;
   height: 16rem;
-  background: rgba(70, 192, 163, 0.12);
+  background: var(--shell-glow-b);
+}
+
+.app-shell[data-theme="editorial"] h1,
+.app-shell[data-theme="editorial"] h2,
+.app-shell[data-theme="editorial"] h3,
+.app-shell[data-theme="editorial"] h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
 }

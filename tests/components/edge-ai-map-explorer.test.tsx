@@ -28,6 +28,8 @@ describe("EdgeAIMapExplorer", () => {
   beforeEach(() => {
     currentParams = new URLSearchParams();
     replace.mockReset();
+    window.localStorage.clear();
+    delete document.documentElement.dataset.theme;
   });
 
   it("renders the full explorer by default", () => {
@@ -68,6 +70,17 @@ describe("EdgeAIMapExplorer", () => {
 
     expect(screen.getByText("Showing 15 / 47")).toBeInTheDocument();
     expect(replace).toHaveBeenCalled();
+  });
+
+  it("switches to the editorial theme on demand", async () => {
+    const user = userEvent.setup();
+
+    render(<EdgeAIMapExplorer content={edgeAIMapContent} />);
+
+    await user.click(screen.getByRole("button", { name: "Editorial" }));
+
+    expect(document.documentElement.dataset.theme).toBe("editorial");
+    expect(window.localStorage.getItem("edge-ai-theme")).toBe("editorial");
   });
 
   it("expands product details on demand", async () => {
