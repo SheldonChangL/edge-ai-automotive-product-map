@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --background: #07111f;
+  --background-soft: #0d1a2a;
+  --surface: rgba(10, 19, 34, 0.72);
+  --surface-strong: rgba(12, 25, 45, 0.94);
+  --surface-elevated: rgba(18, 30, 54, 0.92);
+  --border: rgba(180, 200, 226, 0.16);
+  --border-strong: rgba(180, 200, 226, 0.28);
+  --text: #eff5ff;
+  --text-muted: #9eb0ca;
+  --text-faint: #6d809d;
+  --accent: #ff6b57;
+  --accent-secondary: #46c0a3;
+  --accent-tertiary: #ffd166;
+  --shadow-glow: 0 28px 80px rgba(7, 17, 31, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(255, 107, 87, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(70, 192, 163, 0.12), transparent 24%),
+    linear-gradient(180deg, #06101d 0%, #091425 38%, #07111f 100%);
+  color: var(--text);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: transparent;
+  color: var(--text);
+  font-family:
+    "Hiragino Sans GB",
+    "PingFang TC",
+    "Microsoft JhengHei",
+    "Noto Sans CJK TC",
+    sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(255, 209, 102, 0.28);
+  color: var(--text);
+}
+
+.app-shell {
+  position: relative;
+  overflow: clip;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 999px;
+  filter: blur(32px);
+}
+
+.app-shell::before {
+  top: 5rem;
+  left: -4rem;
+  width: 18rem;
+  height: 18rem;
+  background: rgba(255, 107, 87, 0.16);
+}
+
+.app-shell::after {
+  top: 16rem;
+  right: -3rem;
+  width: 16rem;
+  height: 16rem;
+  background: rgba(70, 192, 163, 0.12);
+}
