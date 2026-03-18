@@ -152,7 +152,7 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
     <main className="app-shell relative isolate min-h-screen">
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 pb-16 pt-6 sm:px-8 lg:px-10">
         <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(8,16,28,0.95),rgba(9,20,37,0.88)_48%,rgba(14,26,45,0.94))] shadow-[var(--shadow-glow)]">
-          <div className="grid gap-8 px-6 py-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(18rem,1fr)] lg:px-10 lg:py-10">
+          <div className="px-6 py-8 lg:px-10 lg:py-10">
             <div className="space-y-6">
               <div className="space-y-4">
                 <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.38em] text-[var(--accent)]">
@@ -197,27 +197,6 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
                       {stat.value}
                     </div>
                     <div className="mt-2 text-sm text-[var(--text-muted)]">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-4 rounded-[1.75rem] border border-white/10 bg-[rgba(255,255,255,0.04)] p-5">
-              <div className="space-y-2">
-                <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
-                  Matrix Notes
-                </p>
-                <p className="text-lg font-semibold text-white">
-                  以設計稿密度感做成可擴充的互動資訊介面
-                </p>
-              </div>
-              <div className="grid gap-3">
-                {content.hero.matrixNotes.map((note) => (
-                  <div
-                    key={note}
-                    className="rounded-2xl border border-white/8 bg-[rgba(6,15,29,0.56)] px-4 py-3 text-sm leading-7 text-[var(--text-muted)]"
-                  >
-                    {note}
                   </div>
                 ))}
               </div>
