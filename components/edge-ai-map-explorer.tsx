@@ -31,6 +31,33 @@ const priorityBadgeStyles: Record<ProductPriorityFilter, string> = {
   low: "border-[#8D99AE]/30 bg-[#8D99AE]/14 text-[#CCD4E1]",
 };
 
+const priorityGuides = [
+  {
+    level: "high",
+    shortLabel: "紅 / 高",
+    title: "量產標配或法規強推",
+    description:
+      "代表市場已經成熟，或受到安全法規與 OEM 導入節奏明確拉動，不是單純功能很多，而是更接近「現在就會上車」。",
+    examples: "例如 DMS、前向攝影機模組、BMS",
+  },
+  {
+    level: "mid",
+    shortLabel: "黃 / 中",
+    title: "正在進入量產拐點",
+    description:
+      "代表需求正在升溫，供應鏈與整車廠開始導入，但還沒有像高優先級那樣成為廣泛標配，通常是下一波放量項目。",
+    examples: "例如 AR-HUD、自動代客泊車 AVP",
+  },
+  {
+    level: "low",
+    shortLabel: "灰 / 低",
+    title: "偏差異化體驗功能",
+    description:
+      "代表產品仍有價值，但多半由品牌定位、成本帶寬或車型等級驅動，較少由法規直接推進，因此導入節奏相對保守。",
+    examples: "例如氛圍燈 AI、智慧雨刷",
+  },
+] as const;
+
 function buildQueryString(
   params: URLSearchParams,
   nextState: { query?: string; priority?: ProductPriorityFilter; category?: string },
@@ -246,6 +273,62 @@ export function EdgeAIMapExplorer({ content }: EdgeAIMapExplorerProps) {
 
           <div className="rounded-full border border-white/10 bg-white/4 px-4 py-2 font-[var(--font-mono)] text-xs uppercase tracking-[0.22em] text-[var(--text-muted)]">
             Showing {filteredCount} / {totalStats.products}
+          </div>
+        </section>
+
+        <section className="rounded-[1.75rem] border border-white/10 bg-[linear-gradient(180deg,rgba(10,19,33,0.92),rgba(8,16,29,0.78))] p-5 shadow-[0_18px_42px_rgba(7,17,31,0.18)]">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+              <div className="space-y-2">
+                <p className="font-[var(--font-mono)] text-xs uppercase tracking-[0.28em] text-[var(--text-faint)]">
+                  Priority Guide
+                </p>
+                <h2 className="text-xl font-semibold text-white">優先級怎麼看？</h2>
+              </div>
+              <p className="max-w-3xl text-sm leading-7 text-[var(--text-muted)]">
+                這裡的優先級不是在評分功能好壞，而是用
+                <span className="px-1 text-white">市場成熟度</span>
+                和
+                <span className="px-1 text-white">法規驅動力</span>
+                來幫你判斷哪些品類已經接近標配、哪些正要放量、哪些仍偏差異化。
+              </p>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+              {priorityGuides.map((guide) => (
+                <article
+                  key={guide.level}
+                  className="rounded-[1.4rem] border border-white/10 bg-[rgba(255,255,255,0.03)] p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="h-3 w-3 rounded-full"
+                      style={{
+                        backgroundColor:
+                          guide.level === "high"
+                            ? "#E63946"
+                            : guide.level === "mid"
+                              ? "#E9C46A"
+                              : "#8D99AE",
+                      }}
+                    />
+                    <span
+                      className={[
+                        "rounded-full border px-3 py-1 text-xs font-medium",
+                        priorityBadgeStyles[guide.level],
+                      ].join(" ")}
+                    >
+                      {guide.shortLabel}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold text-white">{guide.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[var(--text-muted)]">
+                    {guide.description}
+                  </p>
+                  <p className="mt-3 text-sm text-white/88">{guide.examples}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 

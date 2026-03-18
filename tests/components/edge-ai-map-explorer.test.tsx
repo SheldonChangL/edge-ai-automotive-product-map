@@ -34,6 +34,7 @@ describe("EdgeAIMapExplorer", () => {
     render(<EdgeAIMapExplorer content={edgeAIMapContent} />);
 
     expect(screen.getByRole("heading", { name: "車用電子 AI 產品全景圖" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "優先級怎麼看？" })).toBeInTheDocument();
     expect(screen.getByText("Showing 47 / 47")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "ADAS 先進駕駛輔助" })).toBeInTheDocument();
   });
